@@ -5,10 +5,10 @@ Technic ServerCore v0.1
 Copyright (c) 2013 Syndicate, LLC <http://www.technicpack.net/>
 """
 
-import sys, os, traceback, argparse
+import sys, os, traceback, argparse, errno
 import time
 import re
-import json
+import json, zipfile
 import urllib, urllib2
 import pprint
 
@@ -31,7 +31,7 @@ def main ():
 	    displayPack(args.modpack)
 	elif len(sys.argv) >= 4:
 	    if args.install:
-	        installPack(args.modpack, args.install)
+	        installPack(args.modpack, args.install[0], args.install[1])
             elif args.update:
 	        print
             elif args.wipe:
@@ -64,17 +64,18 @@ def displayPack (pack):
     getPackInfo(pack)
     currentPack.printModpack()
 
-def installPack (pack, build):
+def installPack (pack, build, dest):
 
     getPackInfo(pack)
     if pack == 'attack-of-the-bteam':
         url = "http://mirror.technicpack.net/Technic/servers/bteam/BTeam_Server_v" + build + ".zip"
 	print "\n\rDownlading build: " + build + " of " + currentPack.name + "\n\r"
-	zipDir = os.getcwd() + '/serverZips/'
-	zipFile = zipDir + build + '.zip'
-	if not os.path.exists(zipDir):
-	    os.makedirs(zipDir)
-
+	serverDir = dest + '/serverZips/'
+	serverFile = serverDir + build + '.zip'
+	if not os.path.exists(serverDir):
+	    os.makedirs(serverDir)
+	silentRemove(serverFile)
+	
 	widgets = ['Test: ', Percentage(), ' ', Bar(marker=RotatingMarker()), ' ', ETA(), ' ', FileTransferSpeed()]
         pbar = ProgressBar(widgets=widgets)
 	
@@ -85,8 +86,21 @@ def installPack (pack, build):
 
 	    pbar.update(min(count*blockSize, totalSize))
 	
-	urllib.urlretrieve(url, zipFile, reporthook=dlProgress)
+	urllib.urlretrieve(url, serverFile, reporthook=dlProgress)
 	pbar.finish()
+	print "Download complete!"
+
+	if(zipfile.is_zipfile(serverFile)):
+	    print "\n\rVerifying Zip integrity..."
+	    with zipfile.ZipFile(serverFile, 'r', zipfile.ZIP_DEFLATED, True) as serverZip:
+		if(serverZip.testzip() == None):
+		    print "Extracting server files..."
+		    serverZip.extractall(dest)
+		else:
+		    print "Error: Zip integrity check failed. Please try again."
+		    sys.exit(5)
+	    
+	print "Install complete"	
 
 def listPacks ():
 
@@ -95,14 +109,22 @@ def listPacks ():
     for key in availPacks:
         print '{0} ==> {1}'.format(availPacks[key], key)
     print
-        
+
+def silentRemove (file):
+
+    try:
+	os.remove(file)
+    except OSError as e:
+	if e.errno != errno.ENOENT: # errno.ENOENT = no such file or directory
+	    raise        
+
 
 if __name__ == '__main__':
     try:
         start_time = time.time()
         parser = argparse.ArgumentParser( epilog="Try 'ServerCore --help' for more information.")
         parser.add_argument ('-ls', '--listPacks', action='store_true', default=False, help='list all available modpacks')
-	parser.add_argument ('--install', action='store', metavar='<build>', help='install the currently selected server build')	
+	parser.add_argument ('--install', action='store', nargs='*', metavar=('<build>', '<dest>'), help='install the currently selected server build')	
 	parser.add_argument ('--update', action='store', metavar='<build>', help='update the currently selected server build')
 	parser.add_argument ('--wipe', action='store', metavar='<build>', help='wipe and install the currently seleceted server build')
         parser.add_argument ('modpack', nargs='?',  action='store', help='determines which pack to use')
