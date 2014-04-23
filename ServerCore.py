@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 
 """
-Technic ServerCore
-By: GenPage
+Technic ServerCore v0.1
 Copyright (c) 2013 Syndicate, LLC <http://www.technicpack.net/>
 """
 
@@ -16,8 +15,14 @@ import pprint
 def main ():
 
     global args
-    # TODO: Do something more interesting here...
-    print args
+    if args.verbose: print sys.argv
+    if args.listPacks:
+	if len(sys.argv) > 2:
+	    print "Error: Too many args"
+            sys.exit(2)     
+	else:
+ 	    listPacks()
+    if args.pack: setPack()
 
 def getPacks ():
 
@@ -29,28 +34,36 @@ def getPacks ():
 
 def getPackInfo ():
 
+    print
+
+def setPack ():
+
     global currentPack
+    print args.pack  
 
 def listPacks ():
 
-    pprint.pprint(availPacks)
+    print "\n\rModpacks:"
+    print "==========="
+    for key in availPacks:
+        print '{0} ==> {1}'.format(availPacks[key], key)
+    print
         
 
 if __name__ == '__main__':
     try:
         start_time = time.time()
-        parser = argparse.ArgumentParser( usage=globals()['__doc__'])
+        parser = argparse.ArgumentParser( epilog="Try 'ServerCore --help' for more information.")
         parser.add_argument ('-l', '--listPacks', action='store_true', default=False, help='list all available modpacks')
-	parser.add_argument ('-s', '--setPack', action='store',  help='verbose output')
-	parser.add_argument ('-v', '--verbose', action='store_true', default=False, help='verbose output')
-        parser.add_argument ('--version', action='version', version='%(prog)s 0.1')
+	parser.add_argument ('pack', nargs='?',  action='store', help='determines which pack to use')
+	parser.add_argument ('--verbose', action='store_true', default=False, help='verbose output')
+        parser.add_argument ('-v', '--version', action='version', version=globals()['__doc__'])
         args = parser.parse_args()
-        #if len(args) < 1:
-        #    parser.error ('missing argument')
+#        if not len(sys.argv) > 1:
+#            parser.error ('missing argument')
         if args.verbose: print time.asctime()
 	getPacks()
-	if args.listPacks: listPacks()
-	else: main()
+	main()
         if args.verbose: print time.asctime()
         if args.verbose: print 'TOTAL TIME IN MINUTES:',
         if args.verbose: print (time.time() - start_time) / 60.0
