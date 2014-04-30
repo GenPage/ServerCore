@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Technic ServerCore v0.2-alpha
+Technic ServerCore v0.2-beta
 Copyright (c) 2013-2014 Syndicate, LLC <http://www.technicpack.net/>
 """
 
@@ -120,22 +120,41 @@ def downloadPack(pack, build):
     currentBuild = getBuild(build)
     if pack == 'attack-of-the-bteam':
         url = "http://mirror.technicpack.net/Technic/servers/bteam/BTeam_Server_v" + currentBuild + ".zip"
-        print "\n\rDownlading build: " + currentBuild + " of " + currentPack.name + "\n\r"
-        serverDir = os.path.expanduser('~/TechnicServerCore/serverZips/' + currentPack.display_name)
-        serverFile = serverDir + '-v' + currentBuild + '.zip'
-        if not os.path.exists(serverDir):
-            print "Creating directory: " + serverDir
-            os.makedirs(serverDir)
+    elif pack == 'tekkitmain':
+        url = "http://mirror.technicpack.net/Technic/servers/tekkitmain/Tekkit_Server_v" + currentBuild + ".zip"
+    elif pack == 'hexxit':
+        url = "http://mirror.technicpack.net/Technic/servers/hexxit/Hexxit_Server_v" + currentBuild + ".zip"
+    elif pack == 'tekkitlite':
+        url = "http://mirror.technicpack.net/Technic/servers/tekkitlite/Tekkit_Lite_Server_" + currentBuild + ".zip"
+    elif pack == 'tekkit':
+        url = "http://mirror.technicpack.net/Technic/servers/tekkit/Tekkit_Server_" + currentBuild + ".zip"
+    elif pack == 'bigdig':
+        url = "http://mirror.technicpack.net/Technic/servers/bigdig/BigDigServer-v" + currentBuild + ".zip"
+    elif pack == 'voltz':
+        url = "http://mirror.technicpack.net/Technic/servers/voltz/Voltz_Server_v" + currentBuild + ".zip"
+    else:
+        print currentPack.name + "has been retired from the Technic Launcher and is no longer available."
+        sys.exit(0)
+    
+    if args.verbose: print url
+    print "\n\rDownlading build: " + currentBuild + " of " + currentPack.name + "\n\r"
+    serverDir = os.path.expanduser('~/TechnicServerCore/serverZips/' + currentPack.display_name)
+    if args.verbose: print serverDir
+    serverFile = serverDir + '/' + currentPack.display_name + '-v' + currentBuild + '.zip'
+    if args.verbose: print serverFile
+    if not os.path.exists(serverDir):
+        print "Creating directory: " + serverDir
+        os.makedirs(serverDir)
 
-        if os.path.exists(serverFile):
-            if confirmInput("Zip already downloaded. Do you wish to re-download?", "yes"):  
-                silentRemove(serverFile)
-                downloadFile(url, serverFile)
-            else:
-                print "Download aborted! \n\r"
-        else:
+    if os.path.exists(serverFile):
+        if confirmInput("Zip already downloaded. Do you wish to re-download?", "yes"):  
+            silentRemove(serverFile)
             downloadFile(url, serverFile)
-        return serverFile
+        else:
+            print "Download aborted! \n\r"
+    else:
+        downloadFile(url, serverFile)
+    return serverFile
 
 def installPack(pack, build, dest):
 

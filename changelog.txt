@@ -1,6 +1,10 @@
 
 Technic ServerCore, Copyright (c) 2013-2014 Syndicate, LLC <http://www.technicpack.net/>
 
+--------- Version 0.2-beta -----------
+- Added mirror urls for all official packs
+- Added case check for retired packs
+
 ------- Version 0.2-alpha ---------
 * This is a massive update/refractor *
 - Updated installPack() to call downloadPack() and unzip the file
