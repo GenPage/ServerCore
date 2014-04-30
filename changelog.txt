@@ -1,0 +1,33 @@
+
+Technic ServerCore, Copyright (c) 2013-2014 Syndicate, LLC <http://www.technicpack.net/>
+
+------- Version 0.2-alpha ---------
+* This is a massive update/refractor *
+- Updated installPack() to call downloadPack() and unzip the file
+- Updated args to reflect method changes
+- Added wipePack() to wipe the directory before calling installPack()
+- Added confirmInput() method
+- Added getBuild() method to parse 'latest' & 'recommended' options
+- Added parser.error() where needed
+- Added more arg checking in main() method
+- Moved actual download handling to new method, downloadFile()
+- Moved downloading zips to downloadPack() which calls downloadFile()
+- Prompt for directory when installing/wiping
+
+--------- Version 0.1.3 -----------
+- Finish installPack
+  - Now unzips the server archive to specified des
+  - Checks the zip for errors/corruption
+- Added method to silently remove files
+
+--------- Version 0.1.2 -----------
+- Added Modpack.py class for handling Solder pack data
+- Formatted display pack info
+- Added Progressbar module for visual dl referencing
+- Started installPack
+
+--------- Version 0.1.1 -----------
+- Convert optparse to argparse (optparse depreciated)
+
+--------- Version 0.1 -----------
+- Poll available modpacks from Technic Solder and list them (-ls)
