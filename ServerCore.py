@@ -1,44 +1,95 @@
 #!/usr/bin/env python
 
 """
-Technic ServerCore v0.1
-Copyright (c) 2013 Syndicate, LLC <http://www.technicpack.net/>
+Technic ServerCore v0.2-alpha
+Copyright (c) 2013-2014 Syndicate, LLC <http://www.technicpack.net/>
 """
 
 import sys, os, traceback, argparse, errno
-import time
-import re
+import time, shutil, pprint
 import json, zipfile
 import urllib, urllib2
-import pprint
+
 
 from Modpack import SolderPack
 from progressbar import ProgressBar, Percentage, Bar, RotatingMarker, ETA, FileTransferSpeed
 
-def main ():
+def main():
 
     global args
 
     if args.verbose: print sys.argv
     if args.listPacks:
-	if len(sys.argv) > 2:
-	    print "Error: Too many args"
-            sys.exit(2)     
-	else:
- 	    listPacks()
-    if args.modpack:
-	if len(sys.argv) == 2:
-	    displayPack(args.modpack)
-	elif len(sys.argv) >= 4:
-	    if args.install:
-	        installPack(args.modpack, args.install[0], args.install[1])
-            elif args.update:
-	        print
-            elif args.wipe:
-                print
+        if args.verbose:
+            if len(sys.argv) > 3:
+                parser.error(" Too many args")
+                sys.exit(2)
+            else:
+                listPacks()
+        else:
+	    if len(sys.argv) > 2:	    
+	        parser.error(" Too many args")
+                sys.exit(2)     
+	    else:
+ 	        listPacks()
+    elif args.modpack:
+        if not args.verbose:
+	    if len(sys.argv) == 2:
+	        displayPack(args.modpack)
+	    elif len(sys.argv) == 4:
+	        if args.install:
+	            sys.stdout.write("Install directory: [" + os.path.expanduser('~/TechnicServerCore/servers/') + "] ")
+                    choice = raw_input()
+                    if not choice:
+                        choice = os.path.expanduser('~/TechnicServerCore/servers/')
+                    installPack(args.modpack, args.install, os.path.expanduser(choice))
+                elif args.download:
+	            downloadPack(args.modpack, args.download)
+                elif args.wipe:
+                    sys.stdout.write("Install directory: [" + os.path.expanduser('~/TechnicServerCore/servers/') + "] ")
+                    choice = raw_input()
+                    if not choice:
+                        choice = os.path.expanduser('~/TechnicServerCore/servers/')
+                    wipePack(args.modpack, args.wipe, os.path.expanduser(choice))
+            elif len(sys.argv) > 4:
+                parser.error("Too many args provided")
+                sys.exit(2)
+        elif args.verbose:
+            if len(sys.argv) == 3:
+                displayPack(args.modpack)
+            elif len(sys.argv) == 5:
+                if args.install:
+                    sys.stdout.write("Install directory: [" + os.path.expanduser('~/TechnicServerCore/servers/') + "] ")
+                    choice = raw_input()
+                    if not choice:
+                        choice = os.path.expanduser('~/TechnicServerCore/servers/')
+                    installPack(args.modpack, args.install, os.path.expanduser(choice))
+                elif args.download:
+                    downloadPack(args.modpack, args.download)
+                elif args.wipe:
+                    sys.stdout.write("Install directory: [" + os.path.expanduser('~/TechnicServerCore/servers/') + "] ")
+                    choice = raw_input()
+                    if not choice:
+                        choice = os.path.expanduser('~/TechnicServerCore/servers/')
+                    wipePack(args.modpack, args.wipe, os.path.expanduser(choice))
+            elif len(sys.argv) > 5:
+                parser.error("Too many args provided")
+                sys.exit(2)
+    else:
+        parser.error("No modpack provided")
+        sys.exit(5)
 	
 
-def getPacks ():
+def getBuild(build):
+   
+    if 'latest' in build:
+        return str(currentPack.latest)
+    elif 'recommended' in build:
+        return str(currentPack.recommended)
+    else:
+        return build
+
+def getPacks():
 
     global availPacks, mirrorURL
     rawJSON = urllib2.urlopen('http://solder.technicpack.net/api/modpack').read()
@@ -46,63 +97,89 @@ def getPacks ():
     mirrorURL = solderJSON['mirror_url']
     availPacks = solderJSON['modpacks']
 
-def getPackInfo (pack):
+def getPackInfo(pack):
 
     global currentPack
     currentPack = SolderPack()
     rawJSON = urllib2.urlopen('http://solder.technicpack.net/api/modpack/' + pack).read()
     modpackJSON = json.loads(rawJSON)
     if 'error' in modpackJSON:
-        print "Invalid Modpack: No modpack found"
+        parser.error("Invalid Modpack - No modpack found")
         sys.exit(3)
     currentPack.setModpack(
         modpackJSON['display_name'], modpackJSON['name'], modpackJSON['url'], modpackJSON['recommended'], modpackJSON['latest'], modpackJSON['builds'])
-  
 
-def displayPack (pack):
+def displayPack(pack):
 
     getPackInfo(pack)
     currentPack.printModpack()
 
-def installPack (pack, build, dest):
+def downloadPack(pack, build):
 
     getPackInfo(pack)
+    currentBuild = getBuild(build)
     if pack == 'attack-of-the-bteam':
-        url = "http://mirror.technicpack.net/Technic/servers/bteam/BTeam_Server_v" + build + ".zip"
-	print "\n\rDownlading build: " + build + " of " + currentPack.name + "\n\r"
-	serverDir = dest + '/serverZips/'
-	serverFile = serverDir + build + '.zip'
-	if not os.path.exists(serverDir):
-	    os.makedirs(serverDir)
-	silentRemove(serverFile)
-	
-	widgets = ['Test: ', Percentage(), ' ', Bar(marker=RotatingMarker()), ' ', ETA(), ' ', FileTransferSpeed()]
-        pbar = ProgressBar(widgets=widgets)
-	
-	def dlProgress(count, blockSize, totalSize):
-	    if pbar.maxval is None:
-        	pbar.maxval = totalSize
-        	pbar.start()
+        url = "http://mirror.technicpack.net/Technic/servers/bteam/BTeam_Server_v" + currentBuild + ".zip"
+        print "\n\rDownlading build: " + currentBuild + " of " + currentPack.name + "\n\r"
+        serverDir = os.path.expanduser('~/TechnicServerCore/serverZips/' + currentPack.display_name)
+        serverFile = serverDir + '-v' + currentBuild + '.zip'
+        if not os.path.exists(serverDir):
+            print "Creating directory: " + serverDir
+            os.makedirs(serverDir)
 
-	    pbar.update(min(count*blockSize, totalSize))
-	
-	urllib.urlretrieve(url, serverFile, reporthook=dlProgress)
-	pbar.finish()
-	print "Download complete!"
+        if os.path.exists(serverFile):
+            if confirmInput("Zip already downloaded. Do you wish to re-download?", "yes"):  
+                silentRemove(serverFile)
+                downloadFile(url, serverFile)
+            else:
+                print "Download aborted! \n\r"
+        else:
+            downloadFile(url, serverFile)
+        return serverFile
 
-	if(zipfile.is_zipfile(serverFile)):
-	    print "\n\rVerifying Zip integrity..."
-	    with zipfile.ZipFile(serverFile, 'r', zipfile.ZIP_DEFLATED, True) as serverZip:
-		if(serverZip.testzip() == None):
+def installPack(pack, build, dest):
+
+    serverFile = downloadPack(pack, build)
+    currentBuild = getBuild(build)
+    print "Installing build: " + currentBuild + " of " + currentPack.name + "\n\r"
+    if(zipfile.is_zipfile(serverFile)):
+        print "Verifying Zip integrity..."
+	with zipfile.ZipFile(serverFile, 'r', zipfile.ZIP_DEFLATED, True) as serverZip:
+            if(serverZip.testzip() == None):
+                print "Checking for directory..."
+                if not os.path.exists(dest):
+                    print "Directory does not exist. Creating..."
+                    if args.verbose: print dest
+                    os.makedirs(dest)
 		    print "Extracting server files..."
+                    if args.verbose: pprint.pprint(serverZip.namelist())
 		    serverZip.extractall(dest)
-		else:
-		    print "Error: Zip integrity check failed. Please try again."
-		    sys.exit(5)
-	    
-	print "Install complete"	
+                else:
+                    print "Error: Directory already exists. Please use --wipe"
+                    sys.exit(8)
+            else:
+                print "Error: Zip integrity check failed. Please try again."
+                sys.exit(5)
+        print "Install complete"	
 
-def listPacks ():
+def wipePack(pack, build, dest):
+    
+    if os.path.exists(dest): 
+        if confirmInput("Are you sure you want to wipe this directory?", "no"):
+            print "Wiping directory: " + dest
+            shutil.rmtree(dest)
+            installPack(pack, build, dest)
+        else:
+            print "Aborting..."
+            sys.exit(0)
+    else:
+        if confirmInput("Directory does not exist. Would you still like to install this server pack?", "no"):
+            installPack(pack, build, dest)
+        else:
+            print "Aborting..."
+            sys.exit(0)
+
+def listPacks():
 
     print "\n\rModpacks:"
     print "==========="
@@ -110,23 +187,64 @@ def listPacks ():
         print '{0} ==> {1}'.format(availPacks[key], key)
     print
 
-def silentRemove (file):
+def silentRemove(file):
 
     try:
 	os.remove(file)
     except OSError as e:
 	if e.errno != errno.ENOENT: # errno.ENOENT = no such file or directory
-	    raise        
+	    raise
 
+def downloadFile(url, file):
+
+    displayFile = os.path.basename(file)
+    widgets = [displayFile + ': ', Percentage(), ' ', Bar(marker=RotatingMarker()), ' ', ETA(), ' ', FileTransferSpeed()]
+    pbar = ProgressBar(widgets=widgets)
+
+    def dlProgress(count, blockSize, totalSize):
+        if pbar.maxval is None:
+            pbar.maxval = totalSize
+            pbar.start()
+
+        pbar.update(min(count*blockSize, totalSize))
+
+    urllib.urlretrieve(url, file, reporthook=dlProgress)
+    pbar.finish()
+    print "Download complete! Downloaded to: " + file + "\n\r"
+            
+
+def confirmInput(question, default):
+
+    valid = {"yes":True,   "y":True,  "ye":True,
+             "no":False,     "n":False}
+    if default == None:
+        prompt = " [y/n] "
+    elif default == "yes":
+        prompt = " [Y/n] "
+    elif default == "no":
+        prompt = " [y/N] "
+    else:
+        raise ValueError("invalid default answer: '%s'" % default)
+    
+    while True:
+        sys.stdout.write(question + prompt)
+        choice = raw_input().lower()
+        if default is not None and choice == '':
+            return valid[default]
+        elif choice in valid:
+            return valid[choice]
+        else:
+            sys.stdout.write("Please respond with 'yes' or 'no' "\
+                             "(or 'y' or 'n').\n")
 
 if __name__ == '__main__':
     try:
         start_time = time.time()
-        parser = argparse.ArgumentParser( epilog="Try 'ServerCore --help' for more information.")
+        parser = argparse.ArgumentParser(description=globals()['__doc__'])
         parser.add_argument ('-ls', '--listPacks', action='store_true', default=False, help='list all available modpacks')
-	parser.add_argument ('--install', action='store', nargs='*', metavar=('<build>', '<dest>'), help='install the currently selected server build')	
-	parser.add_argument ('--update', action='store', metavar='<build>', help='update the currently selected server build')
-	parser.add_argument ('--wipe', action='store', metavar='<build>', help='wipe and install the currently seleceted server build')
+	parser.add_argument ('--install', action='store', nargs=1, metavar=('<build>'), help='installs the provided server build')	
+	parser.add_argument ('--download', action='store', nargs=1, metavar=('<build>'), help='downloads the provided server build')
+	parser.add_argument ('--wipe', action='store', nargs=1, metavar=('<build>'), help='wipe and install the provided server build')
         parser.add_argument ('modpack', nargs='?',  action='store', help='determines which pack to use')
         parser.add_argument ('-v', '--version', action='version', version=globals()['__doc__'])
 	parser.add_argument ('--verbose', action='store_true', default=False, help='verbose output')
