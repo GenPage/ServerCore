@@ -13,6 +13,7 @@ Copyright (c) 2013 Syndicate, LLC <http://www.technicpack.net/>
 ## Building
 ```
 sudo apt-get install python
+sudo apt-get install pip
 pip install progressbar
 python ServerCore.py
 ```
