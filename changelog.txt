@@ -1,6 +1,17 @@
 
 Technic ServerCore, Copyright (c) 2013-2014 Syndicate, LLC <http://www.technicpack.net/>
 
+--------- Version 0.3-alpha -----------
+- Added ability to download ALL modpacks (latest/recommended)
+- Added check for provided build against build list
+- Added default value for build argument (recommended)
+- Added printing Mirror URL with listing of modpacks
+- Moved default download/install directory to global variable
+- Fixed check for if modpack is no longer available/retired
+- Fixed parsing build numbers from stdin
+- Fixed error message formatting
+- Fixed source code formatting
+
 --------- Version 0.2-beta -----------
 - Added mirror urls for all official packs
 - Added case check for retired packs
