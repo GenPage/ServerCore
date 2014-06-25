@@ -293,7 +293,7 @@ def downloadFile(url, file):
     pbar = ProgressBar(widgets=widgets)
 
     def dlProgress(count, blockSize, totalSize):
-        if pbar.maxval is None:
+        if pbar.maxval < totalSize:
             pbar.maxval = totalSize
             pbar.start()
 
@@ -328,36 +328,3 @@ def confirmInput(question, default):
             sys.stdout.write("Please respond with 'yes' or 'no' "\
                              "(or 'y' or 'n').\n")
 
-if __name__ == '__main__':
-    try:
-        start_time = time.time()
-        parser = argparse.ArgumentParser(description=globals()['__doc__'])
-        parser.add_argument ('-ls', '--listPacks', action='store_true', default=False, help='list all available modpacks')
-        parser.add_argument ('--install', const='recommended', nargs='?', metavar=('<build>'), help='installs the provided server build')	
-        parser.add_argument ('--download', const='recommended', nargs='?', metavar=('<build>'), help='downloads the provided server build')
-        parser.add_argument ('--wipe', const='recommended', nargs='?', metavar=('<build>'), help='wipe and install the provided server build')
-        parser.add_argument ('modpack', nargs='?',  action='store', help='determines which pack to use')
-        parser.add_argument ('-v', '--version', action='version', version=globals()['__doc__'])
-        parser.add_argument ('--verbose', action='store_true', default=False, help='verbose output')
-        args = parser.parse_args()
-        if not len(sys.argv) > 1:
-            parser.error ('Missing argument')
-        if args.verbose: print time.asctime()
-        getPacks()
-        main()
-        if args.verbose: print time.asctime()
-        if args.verbose: print 'TOTAL TIME IN SECONDS:',
-        if args.verbose: print (time.time() - start_time)
-        sys.exit(0)
-    except KeyboardInterrupt, e: # Ctrl-C
-        raise e
-    except SystemExit, e: # sys.exit()
-        raise e
-    except urllib2.HTTPError, e: # no json found
-        print 'Error: No JSON found'
-        sys.exit(4)
-    except Exception, e:
-        print 'ERROR, UNEXPECTED EXCEPTION'
-        print str(e)
-        traceback.print_exc()
-        os._exit(1)
