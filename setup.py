@@ -1,10 +1,19 @@
 #!/usr/bin/env python
 
+import os
 from setuptools import setup, find_packages
+
+
+def read(fname):
+    try:
+        return open(os.path.join(os.path.dirname(__file__), fname)).read()
+    except IOError:
+        return ''
+
 
 setup(
     name='TechnicServerCore',
-    version='0.3.0-alpha',
+    version='0.3.1-alpha',
     author='Dylan Page',
     maintainer='Dylan Page',
     author_email='genpage@technicpack.net',
@@ -12,12 +21,15 @@ setup(
     packages=find_packages(),
 
     url='http://github.com/GenPage/ServerCore/',
-    license='LICENSE.txt',
+    license='MIT',
     description='Custom wrapper that downloads and updates Technic modpacks specifically for servers.',
-    long_description=open('README.md').read(),
+    long_description=read('README.rst'),
     install_requires=[
         "progressbar >= 2.2",
     ],
+    entry_points={
+        'console_scripts': ['TechnicServerCore = servercore.ServerCore:main'],
+    },
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Environment :: Console',

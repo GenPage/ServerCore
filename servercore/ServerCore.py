@@ -20,86 +20,116 @@ def main():
     global zipsOutput
     zipsOutput = '~/TechnicServerCore/servers/'
 
-    if args.verbose: print sys.argv
-    if args.listPacks:
-        if args.verbose:
-            if len(sys.argv) > 3:
-                parser.error(" Too many args")
-                sys.exit(2)
-            else:
-                listPacks()
-        else:
-            if len(sys.argv) > 2:
+    try:
+        start_time = time.time()
+        parser = argparse.ArgumentParser(description=globals()['__doc__'])
+        parser.add_argument ('-ls', '--listPacks', action='store_true', default=False, help='list all available modpacks')
+        parser.add_argument ('--install', const='recommended', nargs='?', metavar=('<build>'), help='installs the provided server build')	
+        parser.add_argument ('--download', const='recommended', nargs='?', metavar=('<build>'), help='downloads the provided server build')
+        parser.add_argument ('--wipe', const='recommended', nargs='?', metavar=('<build>'), help='wipe and install the provided server build')
+        parser.add_argument ('modpack', nargs='?',  action='store', help='determines which pack to use')
+        parser.add_argument ('-v', '--version', action='version', version=globals()['__doc__'])
+        parser.add_argument ('--verbose', action='store_true', default=False, help='verbose output')
+        args = parser.parse_args()
+        if not len(sys.argv) > 1:
+            parser.error ('Missing argument')
+        if args.verbose: print time.asctime()
+        if args.verbose: print sys.argv
+        getPacks()
+        if args.listPacks:
+            if args.verbose:
+                if len(sys.argv) > 3:
                     parser.error(" Too many args")
                     sys.exit(2)
+                else:
+                    listPacks()
             else:
-                listPacks()
-    elif args.modpack:
-        if not args.verbose:
-            if len(sys.argv) == 2:
-                displayPack(args.modpack)
-            elif len(sys.argv) == 3:
-                if args.download:
-                    if 'all' in args.modpack:
-                        downloadAllPacks(args.download)
-                    else:
-                        downloadPack(args.modpack, args.download)
-            elif len(sys.argv) == 4:
-                if args.install:
-                    sys.stdout.write("Install directory: [" + os.path.expanduser(zipsOutput) + "] ")
-                    choice = raw_input()
-                    if not choice:
-                        choice = os.path.expanduser(zipsOutput)
-                    installPack(args.modpack, args.install, os.path.expanduser(choice))
-                elif args.download:
-                    if 'all' in args.modpack:
-                        downloadAllPacks(args.download)
-                    else:
-                        downloadPack(args.modpack, args.download)
-                elif args.wipe:
-                    sys.stdout.write("Install directory: [" + os.path.expanduser(zipsOutput) + "] ")
-                    choice = raw_input()
-                    if not choice:
-                        choice = os.path.expanduser(zipsOutput)
-                    wipePack(args.modpack, args.wipe, os.path.expanduser(choice))
-            elif len(sys.argv) > 4:
-                parser.error("Too many args provided")
-                sys.exit(2)
-        elif args.verbose:
-            if len(sys.argv) == 3:
-                displayPack(args.modpack)
-            elif len(sys.argv) == 4:
-                if args.download:
-                    if 'all' in args.modpack:
-                        downloadAllPacks(args.download)
-                    else:
-                        downloadPack(args.modpack, args.download)
-            elif len(sys.argv) == 5:
-                if args.install:
-                    sys.stdout.write("Install directory: [" + os.path.expanduser(zipsOutput) + "] ")
-                    choice = raw_input()
-                    if not choice:
-                        choice = os.path.expanduser(zipsOutput)
-                    installPack(args.modpack, args.install, os.path.expanduser(choice))
-                elif args.download:
-                    if 'all' in args.modpack:
-                        downloadAllPacks(args.download)
-                    else:
-                        downloadPack(args.modpack, args.download)
-                elif args.wipe:
-                    sys.stdout.write("Install directory: [" + os.path.expanduser(zipsOutput) + "] ")
-                    choice = raw_input()
-                    if not choice:
-                        choice = os.path.expanduser(zipsOutput)
-                    wipePack(args.modpack, args.wipe, os.path.expanduser(choice))
-            elif len(sys.argv) > 5:
-                parser.error("Too many args provided")
-                sys.exit(2)
-    else:
-        parser.error("No modpack provided")
-        sys.exit(5)
-	
-
+                if len(sys.argv) > 2:
+                        parser.error(" Too many args")
+                        sys.exit(2)
+                else:
+                    listPacks()
+        elif args.modpack:
+            if not args.verbose:
+                if len(sys.argv) == 2:
+                    displayPack(args.modpack)
+                elif len(sys.argv) == 3:
+                    if args.download:
+                        if 'all' in args.modpack:
+                            downloadAllPacks(args.download)
+                        else:
+                            downloadPack(args.modpack, args.download)
+                elif len(sys.argv) == 4:
+                    if args.install:
+                        sys.stdout.write("Install directory: [" + os.path.expanduser(zipsOutput) + "] ")
+                        choice = raw_input()
+                        if not choice:
+                            choice = os.path.expanduser(zipsOutput)
+                        installPack(args.modpack, args.install, os.path.expanduser(choice))
+                    elif args.download:
+                        if 'all' in args.modpack:
+                            downloadAllPacks(args.download)
+                        else:
+                            downloadPack(args.modpack, args.download)
+                    elif args.wipe:
+                        sys.stdout.write("Install directory: [" + os.path.expanduser(zipsOutput) + "] ")
+                        choice = raw_input()
+                        if not choice:
+                            choice = os.path.expanduser(zipsOutput)
+                        wipePack(args.modpack, args.wipe, os.path.expanduser(choice))
+                elif len(sys.argv) > 4:
+                    parser.error("Too many args provided")
+                    sys.exit(2)
+            elif args.verbose:
+                if len(sys.argv) == 3:
+                    displayPack(args.modpack)
+                elif len(sys.argv) == 4:
+                    if args.download:
+                        if 'all' in args.modpack:
+                            downloadAllPacks(args.download)
+                        else:
+                            downloadPack(args.modpack, args.download)
+                elif len(sys.argv) == 5:
+                    if args.install:
+                        sys.stdout.write("Install directory: [" + os.path.expanduser(zipsOutput) + "] ")
+                        choice = raw_input()
+                        if not choice:
+                            choice = os.path.expanduser(zipsOutput)
+                        installPack(args.modpack, args.install, os.path.expanduser(choice))
+                    elif args.download:
+                        if 'all' in args.modpack:
+                            downloadAllPacks(args.download)
+                        else:
+                            downloadPack(args.modpack, args.download)
+                    elif args.wipe:
+                        sys.stdout.write("Install directory: [" + os.path.expanduser(zipsOutput) + "] ")
+                        choice = raw_input()
+                        if not choice:
+                            choice = os.path.expanduser(zipsOutput)
+                        wipePack(args.modpack, args.wipe, os.path.expanduser(choice))
+                elif len(sys.argv) > 5:
+                    parser.error("Too many args provided")
+                    sys.exit(2)
+        else:
+            parser.error("No modpack provided")
+            sys.exit(5)
+        if args.verbose: print time.asctime()
+        if args.verbose: print 'TOTAL TIME IN SECONDS:',
+        if args.verbose: print (time.time() - start_time)
+        sys.exit(0)
+    except KeyboardInterrupt, e: # Ctrl-C
+        raise e
+    except SystemExit, e: # sys.exit()
+        raise e
+    except urllib2.HTTPError, e: # no json found
+        print 'Error: No JSON found'
+        sys.exit(4)
+    except Exception, e:
+        print 'ERROR, UNEXPECTED EXCEPTION'
+        print str(e)
+        traceback.print_exc()
+        os._exit(1)
+            
 def getBuild(build):
    
     if 'latest' in build:

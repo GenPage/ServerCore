@@ -1,6 +1,11 @@
 
 Technic ServerCore, Copyright (c) 2013-2014 Syndicate, LLC <http://www.technicpack.net/>
 
+--------- Version 0.3.1-alpha -----------
+- Major refractor to implement PyPi Package system
+- Moved script methods back into main()
+- Added setup.py
+
 --------- Version 0.3-alpha -----------
 - Added ability to download ALL modpacks (latest/recommended)
 - Added check for provided build against build list
