@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from distutils.core import setup
+from setuptools import setup, find_packages
 
 setup(
     name='TechnicServerCore',
@@ -9,7 +9,7 @@ setup(
     maintainer='Dylan Page',
     author_email='genpage@technicpack.net',
     maintainer_email='genpage@technicpack.net',	
-    packages=['servercore', 'servercore.test'],
+    packages=find_packages(),
 
     url='http://github.com/GenPage/ServerCore/',
     license='LICENSE.txt',
