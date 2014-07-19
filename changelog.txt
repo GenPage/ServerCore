@@ -1,6 +1,11 @@
 
 Technic ServerCore, Copyright (c) 2013-2014 Syndicate, LLC <http://www.technicpack.net/>
 
+--------- Version 0.3.1-rc1 -----------
+- Fixed issue with parser errors (Fixes #2)
+- Removed printing Technic mirror link to users
+- Switched python build from egg to wheel
+
 --------- Version 0.3.1-beta -----------
 - Fixed AssertionError when trying to track download progress
 - Removed old __main__ method from ServerCore.py

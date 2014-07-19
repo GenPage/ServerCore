@@ -13,7 +13,7 @@ def read(fname):
 
 setup(
     name='TechnicServerCore',
-    version='0.3.1-beta',
+    version='0.3.1-rc1',
     author='Dylan Page',
     maintainer='Dylan Page',
     author_email='genpage@technicpack.net',
@@ -31,12 +31,12 @@ setup(
         'console_scripts': ['TechnicServerCore = servercore.ServerCore:main'],
     },
     classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 4 - Beta',
         'Environment :: Console',
         'Intended Audience :: System Administrators',
-        'License :: OSI Approved :: MIT License',
+        'License :: OSI Approved :: GNU Lesser General Public License v3 or later (LGPLv3+)',
         'Operating System :: OS Independent',
-        'Programming Language :: Python',
+        'Programming Language :: Python :: 2 :: Only',
         'Topic :: Software Development :: Libraries',
         'Topic :: Software Development :: User Interfaces',
         'Topic :: Terminals'

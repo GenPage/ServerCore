@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Technic ServerCore v0.3.0-alpha
+Technic ServerCore v0.3.1-rc1
 Copyright (c) 2013-2014 Syndicate, LLC <http://www.technicpack.net/>
 """
 
@@ -16,7 +16,7 @@ from progressbar import ProgressBar, Percentage, Bar, RotatingMarker, ETA, FileT
 
 def main():
 
-    global args
+    global args, parser
     global zipsOutput
     zipsOutput = '~/TechnicServerCore/servers/'
 
@@ -274,8 +274,6 @@ def listPacks():
     print "==========="
     for key in availPacks:
         print '{0} ==> {1}'.format(availPacks[key], key)
-    print
-    print "\n\rMirror URL: " + mirrorURL
     print
 
 def silentRemove(file):
