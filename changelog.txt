@@ -1,7 +1,8 @@
 
 Technic ServerCore, Copyright (c) 2013-2014 Syndicate, LLC <http://www.technicpack.net/>
 
---------- Version 0.3.1-rc1 -----------
+--------- Version 0.3.1b2 -----------
+- Change versioning format to follow PyPi system (major.minor[.patch][sub])
 - Fixed issue with parser errors (Fixes #2)
 - Removed printing Technic mirror link to users
 - Switched python build from egg to wheel
