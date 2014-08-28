@@ -1,6 +1,12 @@
 
 Technic ServerCore, Copyright (c) 2013-2014 Syndicate, LLC <http://www.technicpack.net/>
 
+--------- Version 0.3.1rc1 -----------
+- Implement Modpack Details commands (-la/--details) (Closes #4)
+- Add new getter methods to Modpack class
+- Add new field 'TargetMC' to support '-la'
+- Add new function 'packMC' to grab MC version from recommended build
+
 --------- Version 0.3.1b2 -----------
 - Change versioning format to follow PyPi system (major.minor[.patch][sub])
 - Fixed issue with parser errors (Fixes #2)

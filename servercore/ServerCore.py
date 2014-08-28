@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Technic ServerCore v0.3.1b2
+Technic ServerCore v0.3.1rc1
 Copyright (c) 2013-2014 Syndicate, LLC <http://www.technicpack.net/>
 """
 
@@ -24,6 +24,7 @@ def main():
         start_time = time.time()
         parser = argparse.ArgumentParser(description=globals()['__doc__'])
         parser.add_argument ('-ls', '--listPacks', action='store_true', default=False, help='list all available modpacks')
+        parser.add_argument ('-la', '--details', action='store_true', default=False, help='list all available modpacks with their rec/lat/tmc')
         parser.add_argument ('--install', const='recommended', nargs='?', metavar=('<build>'), help='installs the provided server build')	
         parser.add_argument ('--download', const='recommended', nargs='?', metavar=('<build>'), help='downloads the provided server build')
         parser.add_argument ('--wipe', const='recommended', nargs='?', metavar=('<build>'), help='wipe and install the provided server build')
@@ -49,6 +50,19 @@ def main():
                         sys.exit(2)
                 else:
                     listPacks()
+        elif args.details:
+            if args.verbose:
+                if len(sys.argv) > 3:
+                    parser.error(" Too many args")
+                    sys.exit(2)
+                else:
+                    detailPacks()
+            else:
+                if len(sys.argv) > 2:
+                        parser.error(" Too many args")
+                        sys.exit(2)
+                else:
+                    detailPacks()
         elif args.modpack:
             if not args.verbose:
                 if len(sys.argv) == 2:
@@ -158,6 +172,13 @@ def getPackInfo(pack):
         sys.exit(3)
     currentPack.setModpack(
         modpackJSON['display_name'], modpackJSON['name'], modpackJSON['url'], modpackJSON['recommended'], modpackJSON['latest'], modpackJSON['builds'])
+    currentPack.setTargetMC(packMC(pack, modpackJSON['recommended']))
+
+def packMC(pack, build):
+
+    rawJSON = urllib2.urlopen('http://solder.technicpack.net/api/modpack/' + pack + '/' + build).read()
+    buildJSON = json.loads(rawJSON)
+    return buildJSON['minecraft']
 
 def displayPack(pack):
 
@@ -274,6 +295,15 @@ def listPacks():
     print "==========="
     for key in availPacks:
         print '{0} ==> {1}'.format(availPacks[key], key)
+    print
+
+def detailPacks():
+
+    print "\n\rModpacks:"
+    print "==========="
+    for key in availPacks:
+        getPackInfo(key)
+        print '{0} ==> {1} [Recommended: {2}, Latest: {3}, MC: {4}]'.format(availPacks[key], key, currentPack.getRecBuild(), currentPack.getLatestBuild(), currentPack.getTargetMC())
     print
 
 def silentRemove(file):

@@ -8,7 +8,7 @@ Copyright (c) 2013 Syndicate, LLC <http://www.technicpack.net/>
 
 **Dependencies**:
 
- * Python 2.7.6 - https://www.python.org/downloads
+ * Python 2.7 - https://www.python.org/downloads
  * progressbar - python module
 
 

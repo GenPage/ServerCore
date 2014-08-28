@@ -13,7 +13,7 @@ def read(fname):
 
 setup(
     name='TechnicServerCore',
-    version='0.3.1b2',
+    version='0.3.1rc1',
     author='Dylan Page',
     maintainer='Dylan Page',
     author_email='genpage@technicpack.net',
@@ -21,7 +21,6 @@ setup(
     packages=find_packages(),
 
     url='http://github.com/GenPage/ServerCore/',
-    license='MIT',
     description='Custom wrapper that downloads and updates Technic modpacks specifically for servers.',
     long_description=read('README.rst'),
     install_requires=[
