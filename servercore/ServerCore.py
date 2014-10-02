@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Technic ServerCore v0.3.1rc1
+Technic ServerCore v0.3.3
 Copyright (c) 2013-2014 Syndicate, LLC <http://www.technicpack.net/>
 """
 
@@ -64,21 +64,13 @@ def main():
                 else:
                     detailPacks()
         elif args.modpack:
+            checkPack(args.modpack)
             if not args.verbose:
                 if len(sys.argv) == 2:
                     displayPack(args.modpack)
                 elif len(sys.argv) == 3:
-                    if args.download:
-                        if 'all' in args.modpack:
-                            downloadAllPacks(args.download)
-                        else:
-                            downloadPack(args.modpack, args.download)
-                elif len(sys.argv) == 4:
                     if args.install:
-                        sys.stdout.write("Install directory: [" + os.path.expanduser(zipsOutput) + "] ")
-                        choice = raw_input()
-                        if not choice:
-                            choice = os.path.expanduser(zipsOutput)
+                        choice = askFileLoc(zipsOutput + args.modpack)
                         installPack(args.modpack, args.install, os.path.expanduser(choice))
                     elif args.download:
                         if 'all' in args.modpack:
@@ -86,10 +78,19 @@ def main():
                         else:
                             downloadPack(args.modpack, args.download)
                     elif args.wipe:
-                        sys.stdout.write("Install directory: [" + os.path.expanduser(zipsOutput) + "] ")
-                        choice = raw_input()
-                        if not choice:
-                            choice = os.path.expanduser(zipsOutput)
+                        choice = askFileLoc(zipsOutput + args.modpack)
+                        wipePack(args.modpack, args.wipe, os.path.expanduser(choice))
+                elif len(sys.argv) == 4:
+                    if args.install:
+                        choice = askFileLoc(zipsOutput + args.modpack)
+                        installPack(args.modpack, args.install, os.path.expanduser(choice))
+                    elif args.download:
+                        if 'all' in args.modpack:
+                            downloadAllPacks(args.download)
+                        else:
+                            downloadPack(args.modpack, args.download)
+                    elif args.wipe:
+                        choice = askFileLoc(zipsOutput + args.modpack)
                         wipePack(args.modpack, args.wipe, os.path.expanduser(choice))
                 elif len(sys.argv) > 4:
                     parser.error("Too many args provided")
@@ -98,17 +99,8 @@ def main():
                 if len(sys.argv) == 3:
                     displayPack(args.modpack)
                 elif len(sys.argv) == 4:
-                    if args.download:
-                        if 'all' in args.modpack:
-                            downloadAllPacks(args.download)
-                        else:
-                            downloadPack(args.modpack, args.download)
-                elif len(sys.argv) == 5:
                     if args.install:
-                        sys.stdout.write("Install directory: [" + os.path.expanduser(zipsOutput) + "] ")
-                        choice = raw_input()
-                        if not choice:
-                            choice = os.path.expanduser(zipsOutput)
+                        choice = askFileLoc(zipsOutput + args.modpack)
                         installPack(args.modpack, args.install, os.path.expanduser(choice))
                     elif args.download:
                         if 'all' in args.modpack:
@@ -116,10 +108,19 @@ def main():
                         else:
                             downloadPack(args.modpack, args.download)
                     elif args.wipe:
-                        sys.stdout.write("Install directory: [" + os.path.expanduser(zipsOutput) + "] ")
-                        choice = raw_input()
-                        if not choice:
-                            choice = os.path.expanduser(zipsOutput)
+                        choice = askFileLoc(zipsOutput + args.modpack)
+                        wipePack(args.modpack, args.wipe, os.path.expanduser(choice))
+                elif len(sys.argv) == 5:
+                    if args.install:
+                        choice = askFileLoc(zipsOutput + args.modpack)
+                        installPack(args.modpack, args.install, os.path.expanduser(choice))
+                    elif args.download:
+                        if 'all' in args.modpack:
+                            downloadAllPacks(args.download)
+                        else:
+                            downloadPack(args.modpack, args.download)
+                    elif args.wipe:
+                        choice = askFileLoc(zipsOutput + args.modpack)
                         wipePack(args.modpack, args.wipe, os.path.expanduser(choice))
                 elif len(sys.argv) > 5:
                     parser.error("Too many args provided")
@@ -128,7 +129,7 @@ def main():
             parser.error("No modpack provided")
             sys.exit(5)
         if args.verbose: print time.asctime()
-        if args.verbose: print 'TOTAL TIME IN SECONDS:',
+        if args.verbose: print 'Total runtime in seconds:',
         if args.verbose: print (time.time() - start_time)
         sys.exit(0)
     except KeyboardInterrupt, e: # Ctrl-C
@@ -139,7 +140,7 @@ def main():
         print 'Error: No JSON found'
         sys.exit(4)
     except Exception, e:
-        print 'ERROR, UNEXPECTED EXCEPTION'
+        print 'Error: Unexpected Exception'
         print str(e)
         traceback.print_exc()
         os._exit(1)
@@ -152,6 +153,12 @@ def getBuild(build):
         return str(currentPack.recommended)
     else:
         return str(build)
+
+def checkPack(pack):
+
+    if pack not in availPacks:
+        parser.error("Invalid Modpack - No modpack found")
+        sys.exit(3)
 
 def getPacks():
 
@@ -167,9 +174,6 @@ def getPackInfo(pack):
     currentPack = SolderPack()
     rawJSON = urllib2.urlopen('http://solder.technicpack.net/api/modpack/' + pack).read()
     modpackJSON = json.loads(rawJSON)
-    if 'error' in modpackJSON:
-        parser.error("Invalid Modpack - No modpack found")
-        sys.exit(3)
     currentPack.setModpack(
         modpackJSON['display_name'], modpackJSON['name'], modpackJSON['url'], modpackJSON['recommended'], modpackJSON['latest'], modpackJSON['builds'])
     currentPack.setTargetMC(packMC(pack, modpackJSON['recommended']))
@@ -213,6 +217,8 @@ def downloadPack(pack, build):
         url = "http://mirror.technicpack.net/Technic/servers/tekkitlite/Tekkit_Lite_Server_" + currentBuild + ".zip"
     elif pack == 'tekkit':
         url = "http://mirror.technicpack.net/Technic/servers/tekkit/Tekkit_Server_" + currentBuild + ".zip"
+    elif pack == 'tppi':
+        url = "http://mirror.technicpack.net/Technic/servers/tppi/TPPIServer-v" +currentBuild + ".zip"
     elif pack == 'bigdig':
         url = "http://mirror.technicpack.net/Technic/servers/bigdig/BigDigServer-v" + currentBuild + ".zip"
     elif pack == 'voltz':
@@ -330,7 +336,15 @@ def downloadFile(url, file):
     urllib.urlretrieve(url, file, reporthook=dlProgress)
     pbar.finish()
     print "Download complete! Downloaded to: " + file + "\n\r"
-            
+
+def askFileLoc(default):
+
+    sys.stdout.write("Install directory: [" + os.path.expanduser(default) + "] ")
+    choice = raw_input()
+    if not choice:
+        return default
+    else:
+        return choice
 
 def confirmInput(question, default):
 

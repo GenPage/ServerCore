@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Technic ServerCore v0.3.1rc1
+Technic ServerCore v0.3.2
 Copyright (c) 2013 Syndicate, LLC <http://www.technicpack.net/>
 """
 

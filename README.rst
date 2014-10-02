@@ -21,8 +21,19 @@ To get the latest stable release from PyPi::
 
 For the latest development release from PyPi::
 
-    $ pip install TechnicServerCore --pre
+    $ pip install --pre TechnicServerCore
 
+For updating an existing install form PyPi::
+
+    $ pip install --upgrade TechnicServerCore
+    $ pip install --upgrade --pre TechnicServerCore
+
+How to get pip (Python Package Index or PyPi)
+---------------------------------------------
+
+Here is documentation on how to install pip:
+
+http://pip.readthedocs.org/en/latest/installing.html
 
 Contributing to the Project
 ---------------------------
@@ -38,4 +49,4 @@ If you want to contribute to this project, please perform the following steps::
 
 Issues
 ------
-Track and submit issues and bugs on the [Issues page](https://github.com/GenPage/ServerCore/issues).
+Track and submit issues and bugs on the `Issues page <https://github.com/GenPage/ServerCore/issues>`_.

@@ -1,6 +1,15 @@
 
 Technic ServerCore, Copyright (c) 2013-2014 Syndicate, LLC <http://www.technicpack.net/>
 
+---------- Version 0.3.3 ------------
+- Fixed --install/--wipe commands for all packs
+- Added checkPack() to verify provided pack name
+- Added askFileLoc() to replace redundant code
+
+---------- Version 0.3.2 ------------
+- Add TPPI pack support
+- Clean up README.rst and provide better documentation
+
 --------- Version 0.3.1rc1 -----------
 - Implement Modpack Details commands (-la/--details) (Closes #4)
 - Add new getter methods to Modpack class

@@ -13,7 +13,7 @@ def read(fname):
 
 setup(
     name='TechnicServerCore',
-    version='0.3.1rc1',
+    version='0.3.3',
     author='Dylan Page',
     maintainer='Dylan Page',
     author_email='genpage@technicpack.net',
